@@ -1,8 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
-let testArray = ' Jorge Melanie Dog Cat Potato'
-let splitTestArray = testArray.split(' ')
 const db = mysql.createConnection(
   {
     host: 'localhost',
@@ -13,6 +11,7 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the employee_tracker database.`)
 );
+
 inquirer
   .prompt([
     
@@ -62,13 +61,13 @@ inquirer
     {
       type: 'input',
       name: 'employeeRole',
-      message: "Enter the employee's role",
+      message: "Enter the employee's role id",
       when: (answers) => (answers.employeeLastName),
     },
     {
       type: 'input',
       name: 'employeeManager',
-      message: "Enter employee's manager",
+      message: "Enter employee's manager id",
       when: (answers) => (answers.employeeRole),
     },
     {
@@ -81,22 +80,34 @@ inquirer
     {
       type: 'input',
       name: 'updateEmployeeRole',
-      message: 'What is the new role for the employee',
+      message: 'What is the new role id for the employee',
       when: (answers) => (answers.updateEmployee),
     }
 ])
 .then(answers => {
     if (answers.options === 'view all departments') {
         //TODO...
+        //db.query('SELECT * FROM department', function (err, res) {
+            //let departmentArray = [];
+            //res.forEach(department => departmentArray.push(department));
+            //console.table(departmentArray);
+            
+        //});
       } else if (answers.options === 'view all roles') {
         //TODO...
       } else if(answers.options === 'view all employees') {
         //TODO...
       } else if (answers.addDepartment){
+        db.query(`INSERT INTO department (name) VALUES ('${answers.addDepartment}') `);
         
       } else if (answers.roleDepartment){
+        db.query(`INSERT INTO role (title, salary, department_id) VALUES ('${answers.roleName}', '${answers.roleSalary}', '${answers.roleDepartment}') `);
 
-      } else if (answers.updateEmployeeRole){
-        
+      } else if (answers.employeeManager){
+        db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${answers.employeeFirstName}', '${answers.employeeLastName}', '${answers.employeeRole}', '${answers.employeeManager}')`);
+      }else if (answers.updateEmployeeRole){
+        //TODO: Pull all employees
+        //TODO: Update role on selected employee
       }
     });
+
