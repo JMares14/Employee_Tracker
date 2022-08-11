@@ -12,6 +12,7 @@ const db = mysql.createConnection(
   console.log(`Connected to the employee_tracker database.`)
 );
 
+
 inquirer
   .prompt([
     
@@ -71,10 +72,9 @@ inquirer
       when: (answers) => (answers.employeeRole),
     },
     {
-      type: 'rawlist',
+      type: 'input',
       name: 'updateEmployee',
-      message: 'Who will you like to update',
-      choices: [`${splitTestArray}`],
+      message: 'Enter the name of the employee',
       when: (answers) => answers.options ==='update an employee role',
     },
     {
@@ -86,28 +86,42 @@ inquirer
 ])
 .then(answers => {
     if (answers.options === 'view all departments') {
-        //TODO...
-        //db.query('SELECT * FROM department', function (err, res) {
-            //let departmentArray = [];
-            //res.forEach(department => departmentArray.push(department));
-            //console.table(departmentArray);
-            
-        //});
+        db.query('SELECT * FROM department', function (err, res) {
+            let departmentArray = [];
+            res.forEach(department => departmentArray.push(department));
+            console.table(departmentArray);
+            db.end()
+        });
       } else if (answers.options === 'view all roles') {
-        //TODO...
+        let rolesArray = [];
+        db.query('SELECT * FROM role', function (err, res) {
+            res.forEach(role => rolesArray.push(role));
+            console.table(rolesArray);
+            db.end()
+        });
       } else if(answers.options === 'view all employees') {
-        //TODO...
+        let employeetArray = [];
+        db.query('SELECT * FROM employee', function (err, res) {
+        res.forEach(employee => employeetArray.push(employee));
+        console.table(employeetArray);
+        db.end()
+        });
       } else if (answers.addDepartment){
         db.query(`INSERT INTO department (name) VALUES ('${answers.addDepartment}') `);
-        
+        console.log('Department has been added');
+        db.end();
       } else if (answers.roleDepartment){
         db.query(`INSERT INTO role (title, salary, department_id) VALUES ('${answers.roleName}', '${answers.roleSalary}', '${answers.roleDepartment}') `);
-
+        console.log('Role has been added')
+        db.end()
       } else if (answers.employeeManager){
         db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${answers.employeeFirstName}', '${answers.employeeLastName}', '${answers.employeeRole}', '${answers.employeeManager}')`);
+        console.log('Employee hasa been added')
+        db.end()
       }else if (answers.updateEmployeeRole){
-        //TODO: Pull all employees
-        //TODO: Update role on selected employee
+        db.query(`UPDATE employee SET role_id =${answers.updateEmployeeRole} WHERE first_name = '${answers.updateEmployee}'`)
+        console.log('Employee has been updated')
+        db.end()
       }
     });
 
